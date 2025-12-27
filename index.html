@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Application Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💼</text></svg>">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="logo">💼</span>
+                <h1>Internship Tracker</h1>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="showSection('dashboard')" id="dashboardBtn">
+                    📊 Dashboard
+                </button>
+                <button class="nav-btn" onclick="showSection('applications')" id="applicationsBtn">
+                    📋 Applications
+                </button>
+                <button class="nav-btn" onclick="openGoogleForm()" id="addBtn">
+                    ➕ Add New
+                </button>
+                <!-- <button class="nav-btn" onclick="openGoogleForm()" id="formBtn">
+                    📝 Google Form
+                </button> -->
+            </div>
+            <button class="refresh-btn" onclick="loadData()" title="Refresh Data">
+                🔄
+            </button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="section active">
+        <div class="container">
+            <h2 class="section-title">📊 Dashboard Overview</h2>
+            
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card total">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <h3 id="totalCount">0</h3>
+                        <p>Total Applications</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card applied">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-content">
+                        <h3 id="appliedCount">0</h3>
+                        <p>Applied</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card interview">
+                    <div class="stat-icon">📞</div>
+                    <div class="stat-content">
+                        <h3 id="interviewCount">0</h3>
+                        <p>Interviews</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card selected">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3 id="selectedCount">0</h3>
+                        <p>Selected</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>📊 Status Distribution</h3>
+                    <canvas id="statusChart"></canvas>
+                </div>
+                
+                <div class="chart-card">
+                    <h3>📅 Application Timeline</h3>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Applications -->
+            <div class="recent-section">
+                <h3>🕒 Recent Applications</h3>
+                <div id="recentApplications" class="recent-grid">
+                    <!-- Recent apps will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Applications Section -->
+    <section id="applications" class="section">
+        <div class="container">
+            <h2 class="section-title">📋 All Applications</h2>
+            
+            <!-- Filters -->
+            <div class="filters">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="🔍 Search by company or position..." 
+                    onkeyup="filterApplications()"
+                >
+                <select id="statusFilter" onchange="filterApplications()">
+                    <option value="all">All Status</option>
+                    <option value="Applied">Applied</option>
+                    <option value="Interview">Interview</option>
+                    <option value="Selected">Selected</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <select id="sortBy" onchange="sortApplications()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="company">Company A-Z</option>
+                    <option value="deadline">Deadline</option>
+                </select>
+            </div>
+
+            <!-- Applications Grid -->
+            <div id="applicationsContainer" class="applications-grid">
+                <!-- Applications will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Add New Application Section -->
+    <section id="add" class="section">
+        <div class="container">
+            <div class="form-container">
+                <h2 class="section-title">➕ Add New Application</h2>
+                
+                <form id="addApplicationForm" onsubmit="submitApplication(event)">
+                    <div class="form-group">
+                        <label for="companyName">
+                            <span class="required">*</span> Company Name
+                        </label>
+                        <input type="text" id="companyName" required placeholder="e.g., Google, Microsoft">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="position">
+                            <span class="required">*</span> Position
+                        </label>
+                        <input type="text" id="position" required placeholder="e.g., Software Engineer Intern">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dateApplied">
+                                <span class="required">*</span> Date Applied
+                            </label>
+                            <input type="date" id="dateApplied" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="status">
+                                <span class="required">*</span> Application Status
+                            </label>
+                            <select id="status" required>
+                                <option value="Applied">Applied</option>
+                                <option value="Interview">Interview Scheduled</option>
+                                <option value="Selected">Selected</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deadline">Deadline</label>
+                        <input type="date" id="deadline">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea 
+                            id="notes" 
+                            rows="4" 
+                            placeholder="Add any additional notes, interview feedback, or follow-up actions..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            ✅ Add Application
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="openGoogleForm()">
+                            📝 Use Google Form Instead
+                        </button>
+                    </div>
+                </form>
+
+                <div class="info-box">
+                    <h4>💡 Quick Tip</h4>
+                    <p>You can also add applications through the <strong>Google Form</strong> for easier mobile access!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading your applications...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Modal for Application Details -->
+    <div id="appModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody">
+                <!-- Application details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="Script.js"></script>
+</body>
+</html>
